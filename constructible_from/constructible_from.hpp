@@ -4,8 +4,12 @@
 
 namespace detail {
 
-template <class Data, class T, class... Args>
+template <class Data, class T, template <typename> class... Rules>
 struct ConstructibleFrom {
+  template <
+      class... Args,
+      typename = typename std::enable_if<(sizeof...(Args) == sizeof...(Rules) &&
+                                          Rules<Args>::value)...>::type>
   constexpr ConstructibleFrom(Args... args) noexcept(
       std::is_nothrow_constructible_v<T, Args...>) {
     // A bit of hackery. The whole Data object is not constructed
@@ -14,13 +18,13 @@ struct ConstructibleFrom {
     // perfectly constructed to that moment, since Holder is another base of
     // Data, preceding ConstructibleFrom in the base-specifier-list.
     auto dataPtr = static_cast<Data*>(this);
-    new (&dataPtr->mem) T(std::forward<Args>(args)...);
+    new (&dataPtr->mem) T{std::forward<Args>(args)...};
   }
 };
 
 }  // namespace detail
 
-template <class DataType, class... ConstructionArgs>
+template <class DataType, template <typename> class... ConstructionArgs>
 class ConstructibleFrom {
  public:
   struct Type;
