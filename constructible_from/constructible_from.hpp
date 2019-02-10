@@ -22,11 +22,12 @@ struct ConstructibleFrom {
 
 template <class DataType, class... ConstructionArgs>
 class ConstructibleFrom {
-  using AlignedStorage =
-      std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
-
  public:
   struct Type;
+
+ private:
+  using AlignedStorage =
+      std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
 
   using ConstructionTrait =
       detail::ConstructibleFrom<Type, DataType, ConstructionArgs...>;
@@ -35,6 +36,7 @@ class ConstructibleFrom {
     AlignedStorage mem;
   };
 
+ public:
   // The constructor of ConstructionTrait became the only possible constructor
   // for Type, since it have no own constructors.
   // Also note that detail::ConstructibleFrom is not an aggregate type, so it
@@ -43,8 +45,7 @@ class ConstructibleFrom {
     using ConstructionTrait::ConstructionTrait;
 
     operator DataType() {
-      DataType* data = reinterpret_cast<DataType*>(&this->mem);
-      return *data;
+      return *reinterpret_cast<DataType*>(&this->mem);
     }
   };
 };
