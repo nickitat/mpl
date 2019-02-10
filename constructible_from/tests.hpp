@@ -1,21 +1,35 @@
 #include "constructible_from.hpp"
 
-namespace SafeIntTest {
+namespace PtrWrapperTest {
 
 template <class T>
 using MatchIntPtr = std::is_same<int*, T>;
 
-using PtrWrapper = ConstructibleFrom<int*, MatchIntPtr>::Type;
+template <class T>
+using MatchNullptrT = std::is_same<std::nullptr_t, T>;
+
+template <class T>
+using PtrWrapperPred = std::disjunction<MatchIntPtr<T>, MatchNullptrT<T>>;
+
+using PtrWrapper = ConstructibleFrom<int*, PtrWrapperPred>::Type;
 
 static_assert(std::is_constructible_v<PtrWrapper, int*>,
-              "SafeInt should be constructible from int.");
-static_assert(!std::is_constructible_v<PtrWrapper, char*>,
-              "SafeInt should be constructible from int.");
-static_assert(!std::is_constructible_v<PtrWrapper, long long*>,
-              "SafeInt should be constructible from int.");
+              "PtrWrapperTest should be constructible from int*.");
+static_assert(std::is_constructible_v<PtrWrapper, std::nullptr_t>,
+              "PtrWrapperTest should be constructible from std::nullptr_t.");
+
+static_assert(!std::is_default_constructible_v<PtrWrapper>,
+              "PtrWrapper should not be default constructible.");
 static_assert(!std::is_constructible_v<PtrWrapper, int>,
-              "SafeInt should be constructible from int.");
+              "PtrWrapperTest should not be constructible from int.");
+static_assert(!std::is_constructible_v<PtrWrapper, bool>,
+              "PtrWrapperTest should not be constructible from bool.");
+
+static_assert(!std::is_constructible_v<PtrWrapper, char*>,
+              "PtrWrapperTest should not be constructible from char*.");
+static_assert(!std::is_constructible_v<PtrWrapper, long long*>,
+              "PtrWrapperTest should not be constructible from long long*.");
 
 static_assert(sizeof(PtrWrapper) == sizeof(int*));
 
-}  // namespace SafeIntTest
+}  // namespace PtrWrapperTest

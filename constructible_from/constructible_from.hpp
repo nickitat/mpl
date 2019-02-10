@@ -6,17 +6,23 @@ namespace detail {
 
 template <class Data, class T, template <typename> class... Rules>
 struct ConstructibleFrom {
-  template <
-      class... Args,
-      typename = typename std::enable_if<(sizeof...(Args) == sizeof...(Rules) &&
-                                          Rules<Args>::value)...>::type>
+  // Seems like empty Args is a special case, since it has no types that violate
+  // the Rules. But what to do with default-constructible parameters? Maybe we
+  // should check sizeof...(Rules) and conditionally permit this constructor?
+  constexpr ConstructibleFrom() = delete;
+
+  template <class... Args,
+            typename = std::enable_if_t<(... && Rules<Args>::value)>>
   constexpr ConstructibleFrom(Args... args) noexcept(
       std::is_nothrow_constructible_v<T, Args...>) {
-    // A bit of hackery. The whole Data object is not constructed
-    // yet and thus accessing its member is not a good idea (precisely, UB). But
-    // |mem| is not an own member of Data, it is derived from Holder which is
-    // perfectly constructed to that moment, since Holder is another base of
-    // Data, preceding ConstructibleFrom in the base-specifier-list.
+    // A bit of hackery. The whole Data object is not
+    // constructed yet and thus accessing its member
+    // is not a good idea (precisely, UB). But |mem|
+    // is not an own member of Data, it is derived
+    // from Holder which is perfectly constructed to
+    // that moment, since Holder is another base of
+    // Data, preceding ConstructibleFrom in the
+    // base-specifier-list.
     auto dataPtr = static_cast<Data*>(this);
     new (&dataPtr->mem) T{std::forward<Args>(args)...};
   }
