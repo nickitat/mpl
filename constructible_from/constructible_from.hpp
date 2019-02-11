@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <type_traits>
 
-template <template <typename> class... ConstructionArgs>
-struct Domain {};
+template <template <typename> class... Rules>
+struct Domains {};
 
 namespace detail {
 
@@ -15,14 +16,17 @@ template <class Data, class T, class Dummy>
 struct ConstructibleFrom;
 
 template <class Data, class T, template <typename> class... Rules>
-struct ConstructibleFrom<Data, T, Domain<Rules...>> {
+struct ConstructibleFrom<Data, T, Domains<Rules...>> {
   // Seems like empty Args is a special case, since it has no types that violate
   // the Rules. But what to do with default-constructible parameters? Maybe we
   // should check sizeof...(Rules) and conditionally permit this constructor?
-  constexpr ConstructibleFrom() = delete;
+  // EDIT: maybe we should have default_constructible_tag, cause special
+  // constructors can not be inherited.
+  ConstructibleFrom() = default;
 
   template <class... Args,
-            typename = std::enable_if_t<(... && Rules<Args>::value)>>
+            typename = std::enable_if_t<sizeof...(Args) == sizeof...(Rules) &&
+                                        (... && Rules<Args>::value)>>
   constexpr ConstructibleFrom(Args... args) noexcept(
       std::is_nothrow_constructible_v<T, Args...>) {
     // A bit of hackery. The whole Data object is not
@@ -34,13 +38,15 @@ struct ConstructibleFrom<Data, T, Domain<Rules...>> {
     // Data, preceding ConstructibleFrom in the
     // base-specifier-list.
     auto dataPtr = static_cast<Data*>(this);
-    new (&dataPtr->mem) T{std::forward<Args>(args)...};
+    ::new ((void*)::std::addressof(dataPtr->mem))
+        T(std::forward<Args>(args)...);
   }
 };
 
 }  // namespace detail
 
-template <class DataType, class... Domains>
+template <class DataType,
+          class... Domains /*, bool isDefaultConstructible = false*/>
 class ConstructibleFrom {
  public:
   struct Type;
@@ -48,9 +54,6 @@ class ConstructibleFrom {
  private:
   using AlignedStorage =
       std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
-
-  //   using ConstructionTrait =
-  //       detail::ConstructibleFrom<Type, DataType, ConstructionArgs...>;
 
   struct Holder {
     AlignedStorage mem;

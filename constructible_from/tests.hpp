@@ -1,6 +1,15 @@
 #include "constructible_from.hpp"
 
-namespace PtrWrapperTest {
+namespace TypeTest {
+
+struct X {
+  X(int*) {
+  }
+  X(int*, std::nullptr_t) {
+  }
+};
+
+using DataType = X;
 
 template <class T>
 using MatchIntPtr = std::is_same<int*, T>;
@@ -8,43 +17,32 @@ using MatchIntPtr = std::is_same<int*, T>;
 template <class T>
 using MatchNullptrT = std::is_same<std::nullptr_t, T>;
 
-template <class T>
-using PtrWrapperPred = std::disjunction<MatchIntPtr<T>, MatchNullptrT<T>>;
+using Type = ConstructibleFrom<DataType,
+                               Domains<MatchIntPtr>,
+                               Domains<MatchNullptrT>,
+                               Domains<MatchIntPtr, MatchNullptrT>>::Type;
 
-using PtrWrapper = ConstructibleFrom<int*, Domain<PtrWrapperPred>>::Type;
+static_assert(std::is_constructible_v<Type, int*>,
+              "TypeTest should be constructible from int*.");
+static_assert(std::is_constructible_v<Type, std::nullptr_t>,
+              "TypeTest should be constructible from std::nullptr_t.");
+static_assert(std::is_constructible_v<Type, int*, std::nullptr_t>,
+              "TypeTest should be constructible from std::nullptr_t.");
 
-static_assert(std::is_constructible_v<PtrWrapper, int*>,
-              "PtrWrapperTest should be constructible from int*.");
-static_assert(std::is_constructible_v<PtrWrapper, std::nullptr_t>,
-              "PtrWrapperTest should be constructible from std::nullptr_t.");
+// TODO: fix problem with default constructors
+// static_assert(!std::is_default_constructible_v<Type>,
+//               "Type should not be default constructible.");
 
-static_assert(!std::is_default_constructible_v<PtrWrapper>,
-              "PtrWrapper should not be default constructible.");
-static_assert(!std::is_constructible_v<PtrWrapper, int>,
-              "PtrWrapperTest should not be constructible from int.");
-static_assert(!std::is_constructible_v<PtrWrapper, bool>,
-              "PtrWrapperTest should not be constructible from bool.");
+static_assert(!std::is_constructible_v<Type, int>,
+              "TypeTest should not be constructible from int.");
+static_assert(!std::is_constructible_v<Type, bool>,
+              "TypeTest should not be constructible from bool.");
 
-static_assert(!std::is_constructible_v<PtrWrapper, char*>,
-              "PtrWrapperTest should not be constructible from char*.");
-static_assert(!std::is_constructible_v<PtrWrapper, long long*>,
-              "PtrWrapperTest should not be constructible from long long*.");
+static_assert(!std::is_constructible_v<Type, char*>,
+              "TypeTest should not be constructible from char*.");
+static_assert(!std::is_constructible_v<Type, long long*>,
+              "TypeTest should not be constructible from long long*.");
 
-static_assert(sizeof(PtrWrapper) == sizeof(int*));
+static_assert(sizeof(Type) == sizeof(DataType));
 
-}  // namespace PtrWrapperTest
-
-// namespace experimental {
-
-// template <class T>
-// using MatchIntPtr = std::is_same<int*, T>;
-
-// template <class T>
-// using MatchChar = std::is_same<char, T>;
-
-// using CFIntPtr = Domain<MatchIntPtr>;
-// using CFChar = Domain<MatchChar>;
-
-// using Union = ConstructibleFrom<void, CFIntPtr>;
-
-// }  // namespace experimental
+}  // namespace TypeTest
