@@ -11,7 +11,7 @@ using MatchNullptrT = std::is_same<std::nullptr_t, T>;
 template <class T>
 using PtrWrapperPred = std::disjunction<MatchIntPtr<T>, MatchNullptrT<T>>;
 
-using PtrWrapper = ConstructibleFrom<int*, PtrWrapperPred>::Type;
+using PtrWrapper = ConstructibleFrom<int*, Domain<PtrWrapperPred>>::Type;
 
 static_assert(std::is_constructible_v<PtrWrapper, int*>,
               "PtrWrapperTest should be constructible from int*.");
@@ -33,3 +33,18 @@ static_assert(!std::is_constructible_v<PtrWrapper, long long*>,
 static_assert(sizeof(PtrWrapper) == sizeof(int*));
 
 }  // namespace PtrWrapperTest
+
+// namespace experimental {
+
+// template <class T>
+// using MatchIntPtr = std::is_same<int*, T>;
+
+// template <class T>
+// using MatchChar = std::is_same<char, T>;
+
+// using CFIntPtr = Domain<MatchIntPtr>;
+// using CFChar = Domain<MatchChar>;
+
+// using Union = ConstructibleFrom<void, CFIntPtr>;
+
+// }  // namespace experimental

@@ -2,10 +2,20 @@
 
 #include <type_traits>
 
+template <template <typename> class... ConstructionArgs>
+struct Domain {};
+
 namespace detail {
 
+// template <class DataType,
+//           template <template <typename> class... Args> class... Domains>
+// struct Receiver {};
+
+template <class Data, class T, class Dummy>
+struct ConstructibleFrom;
+
 template <class Data, class T, template <typename> class... Rules>
-struct ConstructibleFrom {
+struct ConstructibleFrom<Data, T, Domain<Rules...>> {
   // Seems like empty Args is a special case, since it has no types that violate
   // the Rules. But what to do with default-constructible parameters? Maybe we
   // should check sizeof...(Rules) and conditionally permit this constructor?
@@ -30,7 +40,7 @@ struct ConstructibleFrom {
 
 }  // namespace detail
 
-template <class DataType, template <typename> class... ConstructionArgs>
+template <class DataType, class... Domains>
 class ConstructibleFrom {
  public:
   struct Type;
@@ -39,8 +49,8 @@ class ConstructibleFrom {
   using AlignedStorage =
       std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
 
-  using ConstructionTrait =
-      detail::ConstructibleFrom<Type, DataType, ConstructionArgs...>;
+  //   using ConstructionTrait =
+  //       detail::ConstructibleFrom<Type, DataType, ConstructionArgs...>;
 
   struct Holder {
     AlignedStorage mem;
@@ -51,8 +61,9 @@ class ConstructibleFrom {
   // for Type, since it have no own constructors.
   // Also note that detail::ConstructibleFrom is not an aggregate type, so it
   // can be initialized only through constructor call.
-  struct Type : Holder, ConstructionTrait {
-    using ConstructionTrait::ConstructionTrait;
+  struct Type : Holder, detail::ConstructibleFrom<Type, DataType, Domains>... {
+    using detail::ConstructibleFrom<Type, DataType, Domains>::
+        ConstructibleFrom...;
 
     operator DataType() {
       return *reinterpret_cast<DataType*>(&this->mem);
