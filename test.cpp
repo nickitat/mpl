@@ -1,6 +1,11 @@
-#include "tests.hpp"
+#include "constructible_from/tests.hpp"
+
+#include "type_traits_tests.hpp"
 
 #include <iostream>
+#include <type_traits>
+#include <vector>
+using namespace std;
 
 int main() {
   using namespace TypeTest;
