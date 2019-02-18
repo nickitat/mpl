@@ -1,6 +1,6 @@
 #include "constructible_from/tests.hpp"
 
-#include "type_traits_tests.hpp"
+#include "type_traits/type_traits_tests.hpp"
 
 #include <iostream>
 #include <type_traits>
