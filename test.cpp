@@ -1,5 +1,4 @@
 #include "constructible_from/constructible_from_tests.hpp"
-
 #include "safe_types/safe_integer_tests.hpp"
 #include "type_traits/type_traits_tests.hpp"
 
@@ -16,3 +15,4 @@ int main() {
   std::cout << *obj << std::endl;
   return 0;
 }
+ 
