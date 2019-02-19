@@ -3,6 +3,8 @@
 #include <memory>
 #include <type_traits>
 
+namespace constructible_from {
+
 template <template <typename> class... Rules>
 struct Domains {};
 
@@ -70,3 +72,5 @@ class ConstructibleFrom {
   static_assert(sizeof(Type) == sizeof(DataType),
                 "Size of Type should match size of the DataType.");
 };
+
+}  // namespace constructible_from

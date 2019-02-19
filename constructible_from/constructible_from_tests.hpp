@@ -2,6 +2,8 @@
 
 #include "constructible_from.hpp"
 
+using namespace constructible_from;
+
 namespace TypeTest {
 
 struct X {

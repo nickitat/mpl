@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+namespace type_traits {
+
 namespace detail {
 
 template <class To>
@@ -18,6 +20,11 @@ struct IsNonnarrowingConvertible<From,
 
 }  // namespace detail
 
-template <class From, class To, typename = void>
-static constexpr bool IsNonnarrowingConvertible =
-    detail::IsNonnarrowingConvertible<From, To>::value;
+template <class From, class To>
+using IsNonnarrowingConvertible = detail::IsNonnarrowingConvertible<From, To>;
+
+template <class From, class To>
+static constexpr bool IsNonnarrowingConvertibleV =
+    IsNonnarrowingConvertible<From, To>::value;
+
+}  // namespace type_traits
