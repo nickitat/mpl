@@ -7,12 +7,16 @@
 #include <vector>
 using namespace std;
 
+using SafeIntPtr = TypeTest::Type;
+
 int main() {
-  using namespace TypeTest;
   auto ptr = new int{42};
-  Type obj(ptr);
-  std::cout << (int*)obj << std::endl;
-  std::cout << *obj << std::endl;
+  SafeIntPtr obj(ptr);
+  int* raw = static_cast<int*>(obj);
+  int*& ref = static_cast<int*&>(obj);
+  std::cout << raw << std::endl;
+  std::cout << *raw << std::endl;
+  std::cout << ref << std::endl;
   return 0;
 }
  

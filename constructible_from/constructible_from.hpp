@@ -56,6 +56,22 @@ class ConstructibleFrom {
       std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
 
   struct Holder {
+    DataType* const __mem() {
+      return reinterpret_cast<DataType*>(::std::addressof(mem));
+    }
+
+    const DataType* const __mem() const {
+      return reinterpret_cast<DataType*>(::std::addressof(mem));
+    }
+
+    DataType __val() const {
+      return *__mem();
+    }
+
+    DataType& __ref() {
+      return *__mem();
+    }
+
     AlignedStorage mem;
   };
 
@@ -64,13 +80,39 @@ class ConstructibleFrom {
     using detail::ConstructibleFrom<Type, DataType, Domains>::
         ConstructibleFrom...;
 
-    operator DataType() {
-      return *reinterpret_cast<DataType*>(&this->mem);
+    explicit operator DataType() const {
+      return Holder::__val();
+    }
+
+    explicit operator DataType&() {
+      return Holder::__ref();
     }
   };
 
   static_assert(sizeof(Type) == sizeof(DataType),
-                "Size of Type should match size of the DataType.");
+                "Size of Type should match the size of the DataType. There "
+                "should be no memory overhead.");
+
+  // DefaultZeroConstructible may work incorrectly without this two assumptions
+  // being correct.
+  static_assert(std::is_aggregate_v<AlignedStorage>,
+                "AlignedStorage should be an aggregate.");
+  static_assert(std::is_aggregate_v<Holder>, "Holder should be an aggregate.");
 };
+
+namespace traits {
+
+// TODO: implement
+// Makes Type default constructible, underlying storage will be
+// zero-initialized.
+template <class Type>
+struct DefaultZeroConstructible;
+
+// TODO: implement
+// Makes Type not default constructible.
+template <class Type>
+struct NotDefaultConstructible;
+
+}  // namespace traits
 
 }  // namespace constructible_from
