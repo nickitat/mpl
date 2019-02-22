@@ -8,6 +8,16 @@ namespace constructible_from {
 template <template <typename> class... Rules>
 struct Domains {};
 
+template <class... Rules>
+struct Disjunction {
+  static constexpr bool value = (... || Rules::value);
+};
+
+template <class... Rules>
+struct Conjunction {
+  static constexpr bool value = (... && Rules::value);
+};
+
 namespace detail {
 
 template <class Data, class DataType, class Dummy>

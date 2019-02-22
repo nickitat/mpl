@@ -9,7 +9,7 @@ namespace TypeTest {
 struct X {
   X(int*) {
   }
-  X(int*, std::nullptr_t) {
+  X(int*, char*) {
   }
 };
 
@@ -18,13 +18,23 @@ using DataType = int*;
 template <class Rhs>
 using MatchIntPtr = std::is_same<int*, Rhs>;
 
+template <class Rhs>
+using MatchCharPtr = std::is_same<char*, Rhs>;
+
 template <class T>
 using MatchNullptrT = std::is_same<std::nullptr_t, T>;
 
-using Type = ConstructibleFrom<DataType,
-                               Domains<MatchIntPtr>,
-                               Domains<MatchNullptrT>,
-                               Domains<MatchIntPtr, MatchNullptrT>>::Type;
+template <class T>
+using MatchIntPtrOrNull = Disjunction<MatchIntPtr<T>, MatchNullptrT<T>>;
+
+template <class T>
+using MatchCharPtrOrNull = Disjunction<MatchCharPtr<T>, MatchNullptrT<T>>;
+
+using Type =
+    ConstructibleFrom<DataType,
+                      Domains<MatchIntPtr>,
+                      Domains<MatchNullptrT>,
+                      Domains<MatchIntPtrOrNull, MatchCharPtrOrNull>>::Type;
 
 static_assert(std::is_constructible_v<Type, int*>,
               "Type should be constructible from int*.");
@@ -32,6 +42,13 @@ static_assert(std::is_constructible_v<Type, std::nullptr_t>,
               "Type should be constructible from std::nullptr_t.");
 static_assert(std::is_constructible_v<Type, int*, std::nullptr_t>,
               "Type should be constructible from int* and std::nullptr_t.");
+static_assert(std::is_constructible_v<Type, std::nullptr_t, char*>,
+              "Type should be constructible from std::nullptr_t and char*.");
+static_assert(!std::is_constructible_v<Type, std::nullptr_t, int*>,
+              "Type should be constructible from std::nullptr_t and int*.");
+static_assert(
+    std::is_constructible_v<Type, std::nullptr_t, std::nullptr_t>,
+    "Type should be constructible from std::nullptr_t and std::nullptr_t.");
 
 // TODO: fix problem with default constructors
 // static_assert(!std::is_default_constructible_v<Type>,
