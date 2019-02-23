@@ -8,10 +8,11 @@
 
 namespace SafePtrTests {
 
-using SafePtr = safe_types::SafePtr<int*>;
+using SafePtr = safe_types::SafePtr<int>;
 
 static_assert(std::is_constructible_v<SafePtr, int*>, "");
 static_assert(std::is_constructible_v<SafePtr, std::nullptr_t>, "");
+static_assert(!std::is_constructible_v<SafePtr, char*>, "");
 static_assert(!std::is_constructible_v<SafePtr, bool>, "");
 static_assert(!std::is_constructible_v<SafePtr, int>, "");
 static_assert(!type_traits::IsConstructibleFromZeroV<SafePtr>, "");
