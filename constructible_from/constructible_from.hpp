@@ -71,7 +71,7 @@ class ConstructibleFrom {
     }
 
     const DataType* const __mem() const {
-      return reinterpret_cast<DataType*>(::std::addressof(mem));
+      return reinterpret_cast<const DataType*>(::std::addressof(mem));
     }
 
     DataType __val() const {
@@ -79,6 +79,10 @@ class ConstructibleFrom {
     }
 
     DataType& __ref() {
+      return *__mem();
+    }
+
+    const DataType& __ref() const {
       return *__mem();
     }
 
@@ -90,13 +94,15 @@ class ConstructibleFrom {
     using detail::ConstructibleFrom<Type, DataType, Domains>::
         ConstructibleFrom...;
 
-    explicit operator DataType() const {
-      return Holder::__val();
-    }
-
-    explicit operator DataType&() {
+    operator DataType&() & {
       return Holder::__ref();
     }
+
+    operator const DataType&() const& {
+      return Holder::__ref();
+    }
+
+    operator const DataType&() && = delete;
   };
 
   static_assert(sizeof(Type) == sizeof(DataType),

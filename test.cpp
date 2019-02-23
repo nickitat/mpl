@@ -13,11 +13,17 @@ using SafeIntPtr = TypeTest::Type;
 int main() {
   auto ptr = new int{42};
   SafeIntPtr obj(ptr);
+  obj = new int{43};
   int* raw = static_cast<int*>(obj);
   int*& ref = static_cast<int*&>(obj);
   std::cout << raw << std::endl;
   std::cout << *raw << std::endl;
   std::cout << ref << std::endl;
+
+  // const int& i1 = SafeInt<int>(10121); // compilation error as intended
+  SafeInt<int> a(10);
+  int& i2 = a;
+  std::cout << i2 << std::endl;
   return 0;
 }
  
