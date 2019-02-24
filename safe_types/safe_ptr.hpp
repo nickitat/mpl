@@ -22,8 +22,8 @@ class SafePtr {
  public:
   using Type = typename constructible_from::ConstructibleFrom<
       UnderlyingPtrType,
-      Domains<MatchUnderlyingPtr>,
-      Domains<MatchNullptrT>>::Type;
+      Signature<MatchUnderlyingPtr>,
+      Signature<MatchNullptrT>>::Type;
 };
 
 }  // namespace detail

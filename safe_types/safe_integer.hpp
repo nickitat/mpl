@@ -16,7 +16,7 @@ class SafeInt {
  public:
   using Type = typename constructible_from::ConstructibleFrom<
       UnderlyingIntType,
-      Domains<NonnarrowingConvertibleToUnderlyingInt>>::Type;
+      Signature<NonnarrowingConvertibleToUnderlyingInt>>::Type;
 };
 
 }  // namespace detail

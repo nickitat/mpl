@@ -3,6 +3,7 @@
 #include "constructible_from.hpp"
 
 using namespace constructible_from;
+using namespace type_traits;
 
 namespace TypeTest {
 
@@ -32,9 +33,9 @@ using MatchCharPtrOrNull = Disjunction<MatchCharPtr<T>, MatchNullptrT<T>>;
 
 using Type =
     ConstructibleFrom<DataType,
-                      Domains<MatchIntPtr>,
-                      Domains<MatchNullptrT>,
-                      Domains<MatchIntPtrOrNull, MatchCharPtrOrNull>>::Type;
+                      Signature<MatchIntPtr>,
+                      Signature<MatchNullptrT>,
+                      Signature<MatchIntPtrOrNull, MatchCharPtrOrNull>>::Type;
 
 static_assert(std::is_constructible_v<Type, int*>,
               "Type should be constructible from int*.");

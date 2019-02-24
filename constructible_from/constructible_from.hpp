@@ -1,57 +1,28 @@
 #pragma once
 
+#include "../type_traits/type_utilities.hpp"
+
 #include <memory>
 #include <type_traits>
 
 namespace constructible_from {
-namespace utility {
-template <class... Rules>
-struct Disjunction {
-  static constexpr bool value = (... || Rules::value);
-};
 
-template <class... Rules>
-struct Conjunction {
-  static constexpr bool value = (... && Rules::value);
-};
-
-template <class T>
-struct Not {
-  static constexpr bool value = !T::value;
-};
-
-template <class Lhs, class Rhs>
-using MatchLRef = std::is_same<std::add_lvalue_reference_t<Lhs>, Rhs>;
-
-template <class Lhs, class Rhs>
-using MatchRRef = std::is_same<std::add_rvalue_reference_t<Lhs>, Rhs>;
-
-template <class Lhs, class Rhs>
-using MatchAnyRef = Disjunction<MatchLRef<Lhs, Rhs>, MatchRRef<Lhs, Rhs>>;
-
-}  // namespace utility
-}  // namespace constructible_from
-
-namespace constructible_from {
-
-using namespace utility;
-
-template <template <typename> class... Rules>
-struct Domains {};
+template <template <typename> class... Preds>
+struct Signature {};
 
 namespace detail {
 
 template <class Data, class DataType, class Dummy>
 class ConstructibleFrom;
 
-template <class Type, class DataType, template <typename> class... Rules>
-class ConstructibleFrom<Type, DataType, Domains<Rules...>> {
+template <class Type, class DataType, template <typename> class... Preds>
+class ConstructibleFrom<Type, DataType, Signature<Preds...>> {
   template <class... Args>
-  static constexpr bool SizesMatch = sizeof...(Args) == sizeof...(Rules);
+  static constexpr bool SizesMatch = sizeof...(Args) == sizeof...(Preds);
 
   template <class... Args>
   using CheckConstraints =
-      std::enable_if_t<SizesMatch<Args...> && (... && Rules<Args&&>::value)>;
+      std::enable_if_t<SizesMatch<Args...> && (... && Preds<Args&&>::value)>;
 
  public:
   // Should be present because presence of any user-declared constructor (it
@@ -80,8 +51,7 @@ class ConstructibleFrom<Type, DataType, Domains<Rules...>> {
 
 }  // namespace detail
 
-template <class DataType,
-          class... Domains /*, bool isDefaultConstructible = false*/>
+template <class DataType, class... Signature>
 class ConstructibleFrom {
   using AlignedStorage =
       std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
@@ -93,10 +63,6 @@ class ConstructibleFrom {
 
     const DataType* const __mem() const {
       return reinterpret_cast<const DataType*>(::std::addressof(mem));
-    }
-
-    DataType __val() const {
-      return *__mem();
     }
 
     DataType& __ref() {
@@ -111,8 +77,9 @@ class ConstructibleFrom {
   };
 
  public:
-  struct Type : Holder, detail::ConstructibleFrom<Type, DataType, Domains>... {
-    using detail::ConstructibleFrom<Type, DataType, Domains>::
+  struct Type : Holder,
+                detail::ConstructibleFrom<Type, DataType, Signature>... {
+    using detail::ConstructibleFrom<Type, DataType, Signature>::
         ConstructibleFrom...;
 
     operator DataType&() & {

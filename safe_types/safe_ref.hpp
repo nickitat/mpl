@@ -19,7 +19,7 @@ class SafeRef {
 
  public:
   using Type = typename constructible_from::
-      ConstructibleFrom<UnderlyingRefType, Domains<MatchUnderlyingType>>::Type;
+      ConstructibleFrom<UnderlyingRefType, Signature<MatchUnderlyingType>>::Type;
 };
 
 }  // namespace detail
