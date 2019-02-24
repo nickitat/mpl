@@ -44,8 +44,6 @@ static_assert(std::is_constructible_v<Type, int*, std::nullptr_t>,
               "Type should be constructible from int* and std::nullptr_t.");
 static_assert(std::is_constructible_v<Type, std::nullptr_t, char*>,
               "Type should be constructible from std::nullptr_t and char*.");
-static_assert(!std::is_constructible_v<Type, std::nullptr_t, int*>,
-              "Type should be constructible from std::nullptr_t and int*.");
 static_assert(
     std::is_constructible_v<Type, std::nullptr_t, std::nullptr_t>,
     "Type should be constructible from std::nullptr_t and std::nullptr_t.");
@@ -53,6 +51,9 @@ static_assert(
 // TODO: fix problem with default constructors
 // static_assert(!std::is_default_constructible_v<Type>,
 //               "Type should not be default constructible.");
+
+static_assert(!std::is_constructible_v<Type, std::nullptr_t, int*>,
+              "Type should be constructible from std::nullptr_t and int*.");
 
 static_assert(!std::is_constructible_v<Type, int>,
               "Type should not be constructible from int.");
