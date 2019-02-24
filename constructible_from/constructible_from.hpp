@@ -4,10 +4,7 @@
 #include <type_traits>
 
 namespace constructible_from {
-
-template <template <typename> class... Rules>
-struct Domains {};
-
+namespace utility {
 template <class... Rules>
 struct Disjunction {
   static constexpr bool value = (... || Rules::value);
@@ -17,6 +14,30 @@ template <class... Rules>
 struct Conjunction {
   static constexpr bool value = (... && Rules::value);
 };
+
+template <class T>
+struct Not {
+  static constexpr bool value = !T::value;
+};
+
+template <class Lhs, class Rhs>
+using MatchLRef = std::is_same<std::add_lvalue_reference_t<Lhs>, Rhs>;
+
+template <class Lhs, class Rhs>
+using MatchRRef = std::is_same<std::add_rvalue_reference_t<Lhs>, Rhs>;
+
+template <class Lhs, class Rhs>
+using MatchAnyRef = Disjunction<MatchLRef<Lhs, Rhs>, MatchRRef<Lhs, Rhs>>;
+
+}  // namespace utility
+}  // namespace constructible_from
+
+namespace constructible_from {
+
+using namespace utility;
+
+template <template <typename> class... Rules>
+struct Domains {};
 
 namespace detail {
 
@@ -30,7 +51,7 @@ class ConstructibleFrom<Type, DataType, Domains<Rules...>> {
 
   template <class... Args>
   using CheckConstraints =
-      std::enable_if_t<SizesMatch<Args...> && (... && Rules<Args>::value)>;
+      std::enable_if_t<SizesMatch<Args...> && (... && Rules<Args&&>::value)>;
 
  public:
   // Should be present because presence of any user-declared constructor (it
@@ -42,7 +63,7 @@ class ConstructibleFrom<Type, DataType, Domains<Rules...>> {
   ConstructibleFrom() = default;
 
   template <class... Args, typename = CheckConstraints<Args...>>
-  constexpr ConstructibleFrom(Args... args) noexcept(
+  constexpr ConstructibleFrom(Args&&... args) noexcept(
       std::is_nothrow_constructible_v<DataType, Args...>) {
     // A bit of hackery. The entire Type object is not constructed yet and thus
     // accessing its member is not a good idea. But |mem| is not an own member

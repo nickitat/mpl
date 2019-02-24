@@ -16,13 +16,13 @@ struct X {
 using DataType = int*;
 
 template <class Rhs>
-using MatchIntPtr = std::is_same<int*, Rhs>;
+using MatchIntPtr = MatchAnyRef<int*, Rhs>;
 
 template <class Rhs>
-using MatchCharPtr = std::is_same<char*, Rhs>;
+using MatchCharPtr = MatchAnyRef<char*, Rhs>;
 
 template <class T>
-using MatchNullptrT = std::is_same<std::nullptr_t, T>;
+using MatchNullptrT = MatchAnyRef<std::nullptr_t, T>;
 
 template <class T>
 using MatchIntPtrOrNull = Disjunction<MatchIntPtr<T>, MatchNullptrT<T>>;

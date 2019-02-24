@@ -14,10 +14,10 @@ class SafePtr {
   using UnderlyingPtrType = std::add_pointer_t<UnderlyingType>;
 
   template <class Rhs>
-  using MatchUnderlyingPtr = std::is_same<UnderlyingPtrType, Rhs>;
+  using MatchUnderlyingPtr = MatchAnyRef<UnderlyingPtrType, Rhs>;
 
   template <class Rhs>
-  using MatchNullptrT = std::is_same<std::nullptr_t, Rhs>;
+  using MatchNullptrT = MatchAnyRef<std::nullptr_t, Rhs>;
 
  public:
   using Type = typename constructible_from::ConstructibleFrom<
