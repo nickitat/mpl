@@ -97,6 +97,10 @@ class ConstructibleFrom {
                 "Size of Type should match the size of the DataType. There "
                 "should be no memory overhead.");
 
+  // TODO: does this requirement guarantee that the trick inside
+  // ConstructibleFrom's constructor is a perfectly valid code?
+  static_assert(std::is_standard_layout_v<Type>, "");
+
   // DefaultZeroConstructible may work incorrectly without this two assumptions
   // being correct.
   static_assert(std::is_aggregate_v<AlignedStorage>,
