@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/nickitat/mpl.svg?branch=master)](https://travis-ci.com/nickitat/mpl)
+
 # mpl
 It is a small area where I want to learn C++ and especially various metaprogramming techniques,
 being trying my best to create something interesting in addition.
