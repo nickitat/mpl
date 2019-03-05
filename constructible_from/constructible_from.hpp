@@ -93,13 +93,14 @@ class ConstructibleFrom {
     operator const DataType&() && = delete;
   };
 
-  static_assert(sizeof(Type) == sizeof(DataType),
-                "Size of Type should match the size of the DataType. There "
-                "should be no memory overhead.");
-
   // TODO: does this requirement guarantee that the trick inside
   // ConstructibleFrom's constructor is a perfectly valid code?
-  static_assert(std::is_standard_layout_v<Type>, "");
+  static_assert(std::is_standard_layout_v<Type>,
+                "Type is intended to be a standard layout type.");
+
+  static_assert(sizeof(Type) == sizeof(DataType),
+                "Size of Type should match the size of the DataType. EBO is "
+                "guaranteed for standard layout types.");
 
   // DefaultZeroConstructible may work incorrectly without this two assumptions
   // being correct.
