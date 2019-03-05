@@ -22,4 +22,11 @@ static_assert(IsConstructibleFromZeroV<char&&>, "");
 static_assert(!IsConstructibleFromZeroV<int&>, "");
 static_assert(!IsConstructibleFromZeroV<void>, "");
 
+static_assert(IsConstructibleFromValuesWithParens<int*>(0) == true, "");
+static_assert(IsConstructibleFromValuesWithParens<int>(0) == true, "");
+static_assert(IsConstructibleFromValuesWithParens<int>(nullptr) == false, "");
+static_assert(IsConstructibleFromValuesWithBraces<int*>(0) == false, "");
+static_assert(IsConstructibleFromValuesWithBraces<int>(0) == true, "");
+static_assert(IsConstructibleFromValuesWithBraces<int>(nullptr) == false, "");
+
 }  // namespace TypeTraitsTests
