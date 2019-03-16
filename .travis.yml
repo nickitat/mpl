@@ -9,6 +9,9 @@ script:
       -DCMAKE_CXX_COMPILER=${CXX}
   - cmake --build .
 
+after_success:
+  - codecov
+
 matrix:
   include:
     - os: linux
