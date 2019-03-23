@@ -3,11 +3,11 @@ language: cpp
 dist: trusty
 
 script:
-  - mkdir build && cd build;
-  - cmake ../                            
-      -G "Unix Makefiles"                         
+  - cmake .
+      -Bbuild
       -DCMAKE_CXX_COMPILER=${CXX}
-  - cmake --build .
+      -DNICKITAT_MPL_WITH_TESTS=1
+  - cmake --build build
 
 after_success:
   - codecov

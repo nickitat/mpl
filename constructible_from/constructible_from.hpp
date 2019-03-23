@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../type_traits/type_utilities.hpp"
+#include <type_traits/type_utilities.hpp>
 
 #include <memory>
 #include <type_traits>

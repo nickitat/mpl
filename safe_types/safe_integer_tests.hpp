@@ -1,6 +1,6 @@
 #pragma once
 
-#include "safe_integer.hpp"
+#include <safe_types/safe_integer.hpp>
 
 #include <type_traits>
 

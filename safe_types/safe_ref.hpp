@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../constructible_from/constructible_from.hpp"
-#include "../type_traits/type_traits.hpp"
+#include <constructible_from/constructible_from.hpp>
+#include <type_traits/type_traits.hpp>
 
 #include <functional>
 #include <type_traits>

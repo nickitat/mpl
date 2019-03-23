@@ -1,6 +1,6 @@
 #pragma once
 
-#include "constructible_from.hpp"
+#include <constructible_from/constructible_from.hpp>
 
 using namespace constructible_from;
 using namespace type_traits;

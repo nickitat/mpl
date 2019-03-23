@@ -1,8 +1,8 @@
 #pragma once
 
-#include "safe_ref.hpp"
+#include <safe_types/safe_ref.hpp>
 
-#include "../type_traits/type_traits.hpp"
+#include <type_traits/type_traits.hpp>
 
 #include <type_traits>
 
