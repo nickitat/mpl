@@ -33,6 +33,9 @@ class ConstructibleFrom<Type, DataType, Signature<Preds...>> {
   // selected for the actual initialization) will be default-initialized.
   ConstructibleFrom() = default;
 
+  template <class... Args>
+  ConstructibleFrom(const Args&&... args) = delete;
+
   template <class... Args, typename = CheckConstraints<Args...>>
   constexpr ConstructibleFrom(Args&&... args) noexcept(
       std::is_nothrow_constructible_v<DataType, Args...>) {
@@ -51,8 +54,9 @@ class ConstructibleFrom<Type, DataType, Signature<Preds...>> {
 
 }  // namespace detail
 
-template <class DataType, class... Signature>
+template <class _DataType, class... Signature>
 class ConstructibleFrom {
+  using DataType = _DataType;
   using AlignedStorage =
       std::aligned_storage_t<sizeof(DataType), alignof(DataType)>;
 
@@ -79,6 +83,8 @@ class ConstructibleFrom {
  public:
   struct Type : Holder,
                 detail::ConstructibleFrom<Type, DataType, Signature>... {
+    using DataType = _DataType;
+
     using detail::ConstructibleFrom<Type, DataType, Signature>::
         ConstructibleFrom...;
 
@@ -102,6 +108,27 @@ class ConstructibleFrom {
   static_assert(std::is_aggregate_v<AlignedStorage>,
                 "AlignedStorage should be an aggregate.");
   static_assert(std::is_aggregate_v<Holder>, "Holder should be an aggregate.");
+};
+
+// Example usage:
+// using T1 = MakeUnique<class UniqueName1,
+//                       typename ConstructibleFrom<int,
+//                       Signature<Pred>>::Type>;
+// using T2 = MakeUnique<class UniqueName2,
+//                       typename ConstructibleFrom<int,
+//                       Signature<Pred>>::Type>;
+template <class UniqueName, class Instance>
+class MakeUnique : public Instance {
+ public:
+  using DataType = typename Instance::DataType;
+
+  using Instance::Instance;
+
+  template <
+      class AnotherName,
+      class AnotherInstance,
+      typename = std::enable_if_t<!std::is_same_v<UniqueName, AnotherName>>>
+  MakeUnique(MakeUnique<AnotherName, AnotherInstance>) = delete;
 };
 
 namespace traits {
