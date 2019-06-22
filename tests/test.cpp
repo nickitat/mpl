@@ -29,6 +29,7 @@ int main() {
   auto ptr = new int{42};
   SafeIntPtr obj(ptr);
   obj = new int{43};
+  obj = ptr;
   int* raw = obj;
   int*& ref = obj;
   std::cout << raw << std::endl;
@@ -53,7 +54,7 @@ int main() {
   // SafeIntPtr p2(0); // compilation error as intended
   // SafeIntPtr p3{0}; // compilation error as intended
   SafeIntPtr p4{nullptr};
-  // SafeIntPtr p5 = nullptr;
+  SafeIntPtr p5 = nullptr;
 
   // const int& i1 = SafeInt<int>(10121); // compilation error as intended
   SafeInt<int> a(10);
