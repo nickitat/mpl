@@ -31,6 +31,9 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/type_traits/
         PATTERN "*.hpp"
         PATTERN "*tests.hpp" EXCLUDE)
 
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/nickitat_mpl-config.cmake
+        DESTINATION include/mpl)
+
 if(NICKITAT_MPL_WITH_TESTS)
   add_executable(nickitat_mpl_tests tests/test.cpp)
   target_link_libraries(nickitat_mpl_tests nickitat_mpl)
