@@ -11,7 +11,11 @@ set(nickitat_mpl_headers
 add_library(nickitat_mpl INTERFACE)
 target_sources(nickitat_mpl INTERFACE
                "$<BUILD_INTERFACE:${nickitat_mpl_headers}>")
-target_include_directories(nickitat_mpl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(nickitat_mpl INTERFACE
+               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>)
+target_include_directories(type_safe SYSTEM INTERFACE
+               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/mpl>)
+#target_include_directories(nickitat_mpl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/constructible_from/
         DESTINATION include/mpl/constructible_from
