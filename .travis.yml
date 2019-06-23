@@ -8,6 +8,7 @@ script:
       -DCMAKE_CXX_COMPILER=${CXX}
       -DNICKITAT_MPL_WITH_TESTS=1
   - cmake --build build
+  - ./build/nickitat_mpl_tests
 
 after_success:
   - codecov
