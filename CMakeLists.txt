@@ -17,6 +17,13 @@ target_include_directories(nickitat_mpl SYSTEM INTERFACE
                $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/mpl>)
 target_include_directories(nickitat_mpl INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
+set_property(TARGET nickitat_mpl
+             APPEND
+             PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+                      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                      $<INSTALL_INTERFACE:nickitat_mpl-src>
+             )
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/constructible_from/
         DESTINATION include/mpl/constructible_from
         FILES_MATCHING
